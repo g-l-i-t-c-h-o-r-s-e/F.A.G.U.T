@@ -1,2 +1,8 @@
-# F.A.G.U.T
+
+# FFMpeg. 
+# Anonymity. 
+# Glitch. 
+# UDP. 
+# Transmission.
+
 Glitch/Compress Your Webcam To Obscure Your Identity Or Whatever
