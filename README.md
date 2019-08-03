@@ -19,4 +19,6 @@ And this. Install NDI Virtual Input: https://www.newtek.com/ndi/tools/
 
 ▪︎alt+b = Activate ShittyWebcam2.0 UDP Corruption
 
+▪︎alt+c = Kill command-line windows
+
 More Info Soon...
