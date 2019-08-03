@@ -88,33 +88,20 @@ WinSet, AlwaysOnTop,, ayy lmao
 Return
 
 SpeedUpStream:
-Count += 2
-  k := count/1
-  m := Mod(k, 3)
-  s :=  Floor(m)
-  sleep, 10
-if (s = 0)
-{
- SpeedSetting := "fps=60"
-  sleep, 10
- GuiControl, 2:, VideoFilters, %SpeedSetting%
-}
+    k += 2
+    m := Mod(k, 3)
+    s := Floor(m)
+    sleep, 10
 
-if (s = 1)
-{
- SpeedSetting := "mpdecimate,setpts=N/FRAME_RATE/TB"
-  sleep, 10
- GuiControl, 2:, VideoFilters, %SpeedSetting%
-}
+    s_settings := ["fps=60"
+                , "mpdecimate,setpts=N/FRAME_RATE/TB"
+                , ""] ;Last setting left blank as I've seen it to speed up to realtime in some cases.
+				
+    speedSetting := s_settings[s+1]
 
-if (s = 2)
-{
-;Left blank because sometimes this is does the trick in speeding up to realtime.
- SpeedSetting := ""
-  sleep, 10
- GuiControl, 2:, VideoFilters, %SpeedSetting%
-}
-return
+    sleep, 10
+    GuiControl, 2:, VideoFilters, %SpeedSetting%
+Return
 
 
 SaveSettings:
