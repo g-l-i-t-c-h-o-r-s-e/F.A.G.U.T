@@ -10,6 +10,8 @@ https://drive.google.com/file/d/1MhtCV9VmVXMziulUwm3yQ2Q1EkwB7jOo/view
 
 And this. Install NDI Virtual Input: https://www.newtek.com/ndi/tools/
 
+![Image 1](https://i.imgur.com/dPYDHdj.png)![Image 2](https://i.imgur.com/xZLjsrF.png)
+
 # Options
 ▪︎alt+s = Restart regular Stream with new settings
 
