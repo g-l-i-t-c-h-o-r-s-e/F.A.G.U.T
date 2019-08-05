@@ -2,6 +2,7 @@
 #NoEnv
 SetWorkingDir %A_ScriptDir%
 SetBatchLines -1
+#Include Socket.ahk
 
 ;Make ComboBox arrays
 ArrayListIndex := 0
@@ -26,8 +27,9 @@ Gui Add, Slider, x0 y102 w157 h32 Range0-100 vVQuality +Tooltip , 32
 Gui Add, Slider, x0 y202 w157 h32 Range50-50000 vBitrateVal +Tooltip, 50
 GuiControl, Disable, BitrateVal
 Gui Add, Checkbox, x32 y185 w120 h17 vBitrate gEnableBitrate, Force Bitrate?
+Gui Add, Checkbox, x32 y134 w12 h17 vGlitchVar gDisableGlitch,
 Gui Add, Text, x47 y80 w72 h23 +0x200, Video Quality
-Gui Add, Text, x46 y131 w72 h23 +0x200, Glitch Amount
+Gui Add, Text, x48 y131 w72 h15 +0x200, Glitch Amount
 Gui 1:-Sysmenu
 Gui 1:Show, w161 h311,F.A.G.U.T
 winget , hwnd,ID,F.A.G.U.T  ; this will set hwnd to the handle of the window 
@@ -37,6 +39,8 @@ WinSet, alwaysontop ,on,ahk_id %hwnd%
 VideoFilters := "fps=60"
 Resolution := "640x360"
 CodecSettings := "-bf 0 -g 999999"
+NoiseVar := "-bsf noise=36000"
+CustomUDPval := "0088"	 
 Return
 
 GetWebCam:
@@ -65,6 +69,19 @@ VQvar := " "
 }
 return
 
+DisableGlitch:
+GuiControlGet, GlitchVar
+if (GlitchVar = 0) {
+GuiControl, 1:Enable, GlitchAmount
+NoiseVar := "-bsf noise=%GlitchAmount%"
+}
+
+if (GlitchVar = 1) {
+GuiControl, 1:Disable, GlitchAmount
+NoiseVar := " "
+}
+return
+
 EXTRA:
 Gui 2:+LastFoundExist
 if WinExist() {
@@ -78,10 +95,10 @@ Gui 2:Add, Text, x46 y54 w65 h23 +0x200, Video Filters
 Gui 2:Add, Text, x35 y5 w87 h23 +0x200, Video Resolution
 Gui 2:Add, Edit, x17 y193 w120 h21 vCodecSettings, -bf 0 -g 999999
 Gui 2:Add, Text, x24 y173 w120 h18, Video Codec Settings
-Gui 2:Add, Edit, x17 y136 w120 h21 vWao, 0088
+Gui 2:Add, Edit, x17 y136 w120 h21 vCustomUDPval, 0088
 Gui 2:Add, Text, x30 y116 w120 h18, Custom UDP Data
 Gui 2:Add, Button, x47 y221 w59 h18 gSpeedUpStream, speed up
-GuiControl, 2:Disable, wao
+;GuiControl, 2:Disable, wao
 Gui, 2:-Sysmenu
 Gui 2:Show, w153 h300, ayy lmao
 WinSet, AlwaysOnTop,, ayy lmao
@@ -117,11 +134,13 @@ CommenceMagic:
 thread, interrupt, 0
 thread, priority, 0
 gosub, EnableBitrate
+gosub, DisableGlitch
 Gui,Submit, Nohide
 
 transform, BRvar, Deref, %BRvar%
 transform, VQvar, Deref, %VQvar%
-ffmpegvar := "ffmpeg -f dshow -framerate 15 -vcodec mjpeg -i video=""%WebCamName%"" -s %Resolution% -f nut -c:v %VCodec% %BRvar% %VQvar% %CodecSettings% -strict -2 -bsf noise=%GlitchAmount% -vf %VideoFilters% -  | ffmpeg -i - -f libndi_newtek -vf hflip -pix_fmt uyvy422 ShittyWebcam2.0"
+transform, NoiseVar, Deref, %NoiseVar%
+ffmpegvar := "ffmpeg -f dshow -framerate 15 -vcodec mjpeg -i video=""%WebCamName%"" -s %Resolution% -f nut -c:v %VCodec% %BRvar% %VQvar% %CodecSettings% -strict -2 %NoiseVar% -vf %VideoFilters% -  | ffmpeg -i - -f libndi_newtek -vf hflip -pix_fmt uyvy422 ShittyWebcam2.0"
 transform, ffmpegvar, Deref, %ffmpegvar%
  ;msgbox, %ffmpegvar%
 Run, %ComSpec% /c %ffmpegvar%,,Min,pid2
@@ -135,7 +154,8 @@ Gui,Submit, Nohide
 
 transform, BRvar, Deref, %BRvar%
 transform, VQvar, Deref, %VQvar%
-ffmpegvar := "ffmpeg -f dshow -framerate 15 -vcodec mjpeg -i video=""%WebCamName%"" -s %Resolution% -f nut -c:v %VCodec% %BRvar% %VQvar% %CodecSettings% -strict -2 -bsf noise=%GlitchAmount% -vf %VideoFilters% udp:127.0.0.1:1337"
+transform, NoiseVar, Deref, %NoiseVar%
+ffmpegvar := "ffmpeg -f dshow -framerate 15 -vcodec mjpeg -i video=""%WebCamName%"" -s %Resolution% -f nut -c:v %VCodec% %BRvar% %VQvar% %CodecSettings% -strict -2 %NoiseVar% -vf %VideoFilters% udp:127.0.0.1:1337"
 transform, ffmpegvar, Deref, %ffmpegvar%
 
 Run, ffmpeg -f nut -i udp:127.0.0.1:1337 -f libndi_newtek -vf hflip -pix_fmt uyvy422 ShittyWebcam2.0,,Min
@@ -150,9 +170,11 @@ gosub, EnableBitrate
 Gui,Submit, Nohide
 
 transform, BRvar, Deref, %BRvar%
-ffmpegvar := "ffmpeg -f dshow -framerate 15 -vcodec mjpeg -i video=""%WebCamName%"" -s %Resolution% -f nut -c:v %VCodec% %BRvar% %CodecSettings% -q:v %VQuality% -strict -2 -bsf noise=%GlitchAmount% -vf %VideoFilters% -  | ffplay -i -"
+transform, VQvar, Deref, %VQvar%
+transform, NoiseVar, Deref, %NoiseVar%
+ffmpegvar := "ffmpeg -f dshow -framerate 15 -vcodec mjpeg -i video=""%WebCamName%"" -s %Resolution% -f nut -c:v %VCodec% %BRvar% %VQvar% %CodecSettings% -strict -2 %NoiseVar% -vf %VideoFilters% -  | ffplay -i -"
 transform, ffmpegvar, Deref, %ffmpegvar%
- ;msgbox, %ffmpegvar%
+ msgbox, %ffmpegvar%
 Runwait, %ComSpec% /k %ffmpegvar%,,,pid2
 return
 
@@ -215,9 +237,37 @@ sleep, 200
 Process,Close, cmd.exe ; get that shit outta here
 return
 
+;Generates and streams random data
 !b::
 run, ShittyWebcam2.0.ahk
 return
+
+;Streams custom input data, WIP
+!n::
+{
+sleep, 10
+VarSetCapacity(sTest, 64)
+sTest := CustomUDPval
+DllCall("MulDiv", int, &sTest, int, 1, int, 1, str)
+
+UDP := new SocketUDP()
+UDP.Connect(["127.0.0.1", "1337"])
+; The following line has seemingly no effect
+; UDP.SetBroadcast(True)
+
+amount := 1
+while amount < 30
+{
+ UDP.Send(&sTest, 64) ; Call UDP.Send, give it the address of the buffer, and the length of the buffer
+  amount +=1
+sleep, 60
+}
+
+if (amount = 30) {
+VarSetCapacity(sTest, 0)
+return
+ }
+}
 
 GuiEscape:
 GuiClose:
@@ -233,3 +283,5 @@ If errorlevel {
 	}
    ExitApp
 	
+
+
