@@ -28,6 +28,8 @@ Here we see that with some codecs you can kind of get some neat iframe removal w
 
 ▪︎alt+b = Activate ShittyWebcam2.0 UDP Corruption
 
+▪︎alt+n = Custom UDP Corruption via input in options 
+
 ▪︎alt+c = Kill command-line windows
 
 More Info Soon...
