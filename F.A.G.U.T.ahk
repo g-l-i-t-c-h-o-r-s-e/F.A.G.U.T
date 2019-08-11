@@ -88,19 +88,28 @@ if WinExist() {
     Gui, 2:Show
 	return
 }
-Gui 2:Add, Button, x11 y245 w131 h40 gSaveSettings, GOOD TO GO
+Gui 2:Add, Button, x11 y336 w131 h40 gSaveSettings, GOOD TO GO
 Gui 2:Add, Edit, x42 y29 w67 h21 vResolution, 640x360
 Gui 2:Add, Edit, x17 y79 w120 h21 vVideoFilters, fps=60
-Gui 2:Add, Text, x46 y54 w65 h23 +0x200, Video Filters
-Gui 2:Add, Text, x35 y5 w87 h23 +0x200, Video Resolution
-Gui 2:Add, Edit, x17 y193 w120 h21 vCodecSettings, -bf 0 -g 999999
-Gui 2:Add, Text, x24 y173 w120 h18, Video Codec Settings
+Gui 2:Add, Text, x46 y60 w65 h17 +0x200, Video Filters
+Gui 2:Add, Text, x35 y10 w87 h16 +0x200, Video Resolution
+Gui 2:Add, Edit, x17 y284 w120 h21 vCodecSettings, -bf 0 -g 999999
+Gui 2:Add, Text, x24 y264 w120 h18, Video Codec Settings
 Gui 2:Add, Edit, x17 y136 w120 h21 vCustomUDPval, 0088
 Gui 2:Add, Text, x30 y116 w120 h18, Custom UDP Data
-Gui 2:Add, Button, x47 y221 w59 h18 gSpeedUpStream, speed up
+Gui 2:Add, Button, x47 y312 w59 h18 gSpeedUpStream, speed up
+
+Gui 2:Add, Text, x7 y163 w68 h18, Repeat String
+Gui 2:Add, ComboBox, x8 y182 w62 vUDPRepeatAmount Choose1, 0|1|2|3|4|5|6|7|8|9|10|11|12|13|14|15|16|17|18|19|20
+Gui 2:Add, Text, x83 y163 w68 h18, Loop Amount
+Gui 2:Add, ComboBox, x84 y182 w62 vUDPLoopAmount Choose1, 0|1|3|5|10|15|20|25|30|35|40|45|50|55|60|65|70|75|80|85|90|95|100|105|110|115|120|125|130|135|140|145|150|155|160|175|180|195|200
+Gui 2:Add, Text, x26 y210 w127 h18, String Size (Var Cap)
+Gui 2:Add, Edit, x45 y230 w62 vUDPVarCapacitySize, 2064
+
+
 ;GuiControl, 2:Disable, wao
 Gui, 2:-Sysmenu
-Gui 2:Show, w153 h300, ayy lmao
+Gui 2:Show, w153 h395, ayy lmao
 WinSet, AlwaysOnTop,, ayy lmao
 Return
 
@@ -166,6 +175,7 @@ return
 TESTIT:
 thread, interrupt, 0
 thread, priority, 0
+gosub, DisableGlitch
 gosub, EnableBitrate
 Gui,Submit, Nohide
 
@@ -174,7 +184,7 @@ transform, VQvar, Deref, %VQvar%
 transform, NoiseVar, Deref, %NoiseVar%
 ffmpegvar := "ffmpeg -f dshow -framerate 15 -vcodec mjpeg -i video=""%WebCamName%"" -s %Resolution% -f nut -c:v %VCodec% %BRvar% %VQvar% %CodecSettings% -strict -2 %NoiseVar% -vf %VideoFilters% -  | ffplay -i -"
 transform, ffmpegvar, Deref, %ffmpegvar%
- msgbox, %ffmpegvar%
+ ;msgbox, %ffmpegvar%
 Runwait, %ComSpec% /k %ffmpegvar%,,,pid2
 return
 
@@ -245,9 +255,20 @@ return
 ;Streams custom input data, WIP
 !n::
 {
+thread, interrupt, 0
+thread, priority, 0
+gosub, DisableGlitch
+gosub, EnableBitrate
+Gui,Submit, Nohide
+
 sleep, 10
-VarSetCapacity(sTest, 64)
+VarSetCapacity(sTest, UDPVarCapacitySize)
 sTest := CustomUDPval
+{
+ loop, UDPRepeatAmount
+ sTest := sTest . sTest
+ }
+sleep, 1000
 DllCall("MulDiv", int, &sTest, int, 1, int, 1, str)
 
 UDP := new SocketUDP()
@@ -256,18 +277,19 @@ UDP.Connect(["127.0.0.1", "1337"])
 ; UDP.SetBroadcast(True)
 
 amount := 1
-while amount < 30
+while amount < UDPLoopAmount
 {
- UDP.Send(&sTest, 64) ; Call UDP.Send, give it the address of the buffer, and the length of the buffer
+ UDP.Send(&sTest, UDPVarCapacitySize) ; Call UDP.Send, give it the address of the buffer, and the length of the buffer
   amount +=1
 sleep, 60
 }
 
-if (amount = 30) {
+if (amount = UDPLoopAmount) {
 VarSetCapacity(sTest, 0)
 return
  }
 }
+return
 
 GuiEscape:
 GuiClose:
@@ -283,5 +305,3 @@ If errorlevel {
 	}
    ExitApp
 	
-
-
