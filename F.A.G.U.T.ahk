@@ -20,7 +20,7 @@ Gui Add, Button, x87 y269 w64 h24 gTESTIT, TEST
 Gui Add, Button, x69 y246 w19 h47 gUDPCurruption, UDP
 Gui Add, ComboBox, x16 y57 w130 vVcodec Choose8, %List%
 Gui Add, DropDownList, x20 y31 w120 h300 vWebCamName, Integrated Webcam
-Gui Add, Button, x30 y4 w100 h23 vListWebcams gGetWebcam, List WebCams
+Gui Add, Button, x30 y4 w100 h23 vListWebcams gGetWebcam, List Devices
 ;Gui Add, Button, x87 y4 w60 h23, FFplay
 Gui Add, Slider, x0 y151 w157 h32  Range1-90000 vGlitchAmount +Tooltip , 80
 Gui Add, Slider, x0 y102 w157 h32 Range0-100 vVQuality +Tooltip , 32
@@ -45,6 +45,11 @@ CustomUDPval := "0088"
 Return
 
 GetWebCam:
+msgbox,4096,,
+(
+Choose your webcam device name from this list,
+       I haven't pruned the audio devices yet.
+)
 gibdevice := "ffmpeg -f dshow -list_devices true -i null"
 List := ComObjCreate("WScript.Shell").Exec(gibdevice).StdErr.ReadAll()
 List.Visible := false
