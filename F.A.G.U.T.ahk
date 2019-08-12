@@ -27,9 +27,9 @@ Gui Add, Slider, x0 y102 w157 h32 Range0-100 vVQuality +Tooltip , 32
 Gui Add, Slider, x0 y202 w157 h32 Range50-50000 vBitrateVal +Tooltip, 50
 GuiControl, Disable, BitrateVal
 Gui Add, Checkbox, x32 y185 w120 h17 vBitrate gEnableBitrate, Force Bitrate?
-Gui Add, Checkbox, x32 y134 w12 h17 vGlitchVar gDisableGlitch,
+Gui Add, Checkbox, x32 y132 w12 h17 Checked vGlitchVar gDisableGlitch,
 Gui Add, Text, x47 y80 w72 h23 +0x200, Video Quality
-Gui Add, Text, x48 y131 w72 h15 +0x200, Glitch Amount
+Gui Add, Text, x48 y132 w72 h15 +0x200, Glitch Amount
 Gui 1:-Sysmenu
 Gui 1:Show, w161 h311,F.A.G.U.T
 winget , hwnd,ID,F.A.G.U.T  ; this will set hwnd to the handle of the window 
@@ -83,12 +83,12 @@ return
 
 DisableGlitch:
 GuiControlGet, GlitchVar
-if (GlitchVar = 0) {
+if (GlitchVar = 1) {
 GuiControl, 1:Enable, GlitchAmount
 NoiseVar := "-bsf noise=%GlitchAmount%"
 }
 
-if (GlitchVar = 1) {
+if (GlitchVar = 0) {
 GuiControl, 1:Disable, GlitchAmount
 NoiseVar := " "
 }
@@ -315,4 +315,3 @@ If errorlevel {
 	Sleep, 10
 	}
    ExitApp
-	
