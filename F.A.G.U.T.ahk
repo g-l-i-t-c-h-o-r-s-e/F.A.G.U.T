@@ -270,6 +270,7 @@ return
 
 ;Streams custom input data, WIP
 !n::
+return ;Disable For Now...
 {
 sleep, 10
 VarSetCapacity(sTest, UDPVarCapacitySize)
