@@ -19,8 +19,8 @@ Gui Add, Button, x87 y246 w64 h24 gEXTRA, OPTIONS
 Gui Add, Button, x87 y269 w64 h24 gTESTIT, TEST
 Gui Add, Button, x69 y246 w19 h47 gUDPCurruption, UDP
 Gui Add, ComboBox, x16 y57 w130 vVcodec Choose8, %List%
-Gui Add, Edit, x20 y31 w120 h21 vWebCamName, Integrated Webcam
-Gui Add, Button, x30 y4 w100 h23 gGetWebcam, List WebCams
+Gui Add, DropDownList, x20 y31 w120 h300 vWebCamName, Integrated Webcam
+Gui Add, Button, x30 y4 w100 h23 vListWebcams gGetWebcam, List WebCams
 ;Gui Add, Button, x87 y4 w60 h23, FFplay
 Gui Add, Slider, x0 y151 w157 h32  Range1-90000 vGlitchAmount +Tooltip , 80
 Gui Add, Slider, x0 y102 w157 h32 Range0-100 vVQuality +Tooltip , 32
@@ -34,6 +34,7 @@ Gui 1:-Sysmenu
 Gui 1:Show, w161 h311,F.A.G.U.T
 winget , hwnd,ID,F.A.G.U.T  ; this will set hwnd to the handle of the window 
 WinSet, alwaysontop ,on,ahk_id %hwnd%
+GuiControl, Choose, WebCamName, 1
 
 ;Default settings
 VideoFilters := "fps=60"
@@ -44,12 +45,23 @@ CustomUDPval := "0088"
 Return
 
 GetWebCam:
-msgbox, 
-(
-Choose your webcam device name from this list and replace 
-'Integrated Webcam' with the proper name.
-)
-run, %ComSpec% /k ffmpeg -f dshow -list_devices true -i "MOVE ALONG SIR"
+gibdevice := "ffmpeg -f dshow -list_devices true -i null"
+List := ComObjCreate("WScript.Shell").Exec(gibdevice).StdErr.ReadAll()
+List.Visible := false
+
+text := List
+texts := StrSplit(text, "`n", "`r")
+for i, thisText in texts {
+  RegExMatch(thisText, "O)^\[(?:\w+)\s*@\s*(?:[[:xdigit:]]+)\]\s*""(.*?)""$", thisMatch)
+  val .= thisMatch.Value(1) . "|"
+      ;val := StrReplace(val, "|||", "|") ;Remove Triple "|" pipe bar, seems to be uneeded now.
+  val := StrReplace(val, "||", "|") ;Remove Double "|" pipe bar.
+  StringTrimLeft, val2, val, 1
+  }
+GuiControl,, WebCamName, |%val2%
+GuiControl, Disable, ListWebcams
+GuiControl, Choose, WebCamName, 2
+Control, ShowDropDown,, ComboBox2
 return
 
 EnableBitrate:
@@ -95,10 +107,10 @@ Gui 2:Add, Text, x46 y60 w65 h17 +0x200, Video Filters
 Gui 2:Add, Text, x35 y10 w87 h16 +0x200, Video Resolution
 Gui 2:Add, Edit, x17 y284 w120 h21 vCodecSettings, -bf 0 -g 999999
 Gui 2:Add, Text, x24 y264 w120 h18, Video Codec Settings
-Gui 2:Add, Edit, x17 y136 w120 h21 vCustomUDPval, 0088
-Gui 2:Add, Text, x30 y116 w120 h18, Custom UDP Data
 Gui 2:Add, Button, x47 y312 w59 h18 gSpeedUpStream, speed up
 
+Gui 2:Add, Edit, x17 y136 w120 h21 vCustomUDPval, 0088
+Gui 2:Add, Text, x30 y116 w120 h18, Custom UDP Data
 Gui 2:Add, Text, x7 y163 w68 h18, Repeat String
 Gui 2:Add, ComboBox, x8 y182 w62 vUDPRepeatAmount Choose1, 0|1|2|3|4|5|6|7|8|9|10|11|12|13|14|15|16|17|18|19|20
 Gui 2:Add, Text, x83 y163 w68 h18, Loop Amount
@@ -106,8 +118,12 @@ Gui 2:Add, ComboBox, x84 y182 w62 vUDPLoopAmount Choose1, 0|1|3|5|10|15|20|25|30
 Gui 2:Add, Text, x26 y210 w127 h18, String Size (Var Cap)
 Gui 2:Add, Edit, x45 y230 w62 vUDPVarCapacitySize, 2064
 
+;Disabled until I can figure this out.
+GuiControl, 2:Disable, UDPRepeatAmount
+GuiControl, 2:Disable, UDPLoopAmount
+GuiControl, 2:Disable, UDPVarCapacitySize
+GuiControl, 2:Disable, CustomUDPval
 
-;GuiControl, 2:Disable, wao
 Gui, 2:-Sysmenu
 Gui 2:Show, w153 h395, ayy lmao
 WinSet, AlwaysOnTop,, ayy lmao
@@ -255,12 +271,6 @@ return
 ;Streams custom input data, WIP
 !n::
 {
-thread, interrupt, 0
-thread, priority, 0
-gosub, DisableGlitch
-gosub, EnableBitrate
-Gui,Submit, Nohide
-
 sleep, 10
 VarSetCapacity(sTest, UDPVarCapacitySize)
 sTest := CustomUDPval
