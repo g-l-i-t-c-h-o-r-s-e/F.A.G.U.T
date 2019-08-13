@@ -58,12 +58,14 @@ text := List
 texts := StrSplit(text, "`n", "`r")
 for i, thisText in texts {
   RegExMatch(thisText, "O)^\[(?:\w+)\s*@\s*(?:[[:xdigit:]]+)\]\s*""(.*?)""$", thisMatch)
-  val .= thisMatch.Value(1) . "|"
-      ;val := StrReplace(val, "|||", "|") ;Remove Triple "|" pipe bar, seems to be uneeded now.
-  val := StrReplace(val, "||", "|") ;Remove Double "|" pipe bar.
-  StringTrimLeft, val2, val, 1
+  MakeList .= "|" . thisMatch.Value(1)
   }
-GuiControl,, WebCamName, |%val2%
+  
+  DirtyList := StrReplace(MakeList, "||||", "|") ;Remove Duplicate "|" pipe bars.
+  StringTrimLeft, DeviceList, DirtyList, 4 ;Remove Duplicate "|" pipe bars at beginning.
+  DeviceList := StrReplace(DeviceList, "|||", "|=====================================|") ;Split Video & Audio devices
+
+GuiControl,, WebCamName, |%DeviceList%
 GuiControl, Disable, ListWebcams
 GuiControl, Choose, WebCamName, 2
 Control, ShowDropDown,, ComboBox2
@@ -211,6 +213,8 @@ return
 
 
 !s::
+gosub, DisableGlitch
+gosub, EnableBitrate
 Process, Exist, cmd.exe
 If errorlevel { 
   zPid:=errorlevel 
@@ -228,6 +232,8 @@ If errorlevel {
 return
 
 !d::
+gosub, DisableGlitch
+gosub, EnableBitrate
 Process, Exist, cmd.exe
 If errorlevel { 
   zPid:=errorlevel 
