@@ -69,6 +69,12 @@ Return
 
 VideoInput:
 FileSelectFile, UserVideoInput
+ if ErrorLevel {
+msgbox,4096,Yo, Uh, You didn't select shit cap'n.
+GuiControl,1:, VideoInputVar, 0
+return
+}
+else
 UserVideoInput := "-i " . chr(0x22) . UserVideoInput . chr(0x22) ; Encloses file location in quotes.
 GuiControl,1:, VideoInputVar, 1
 return
@@ -180,12 +186,12 @@ if (VideoFilters = "") {
 return
 
 CommenceMagic:
+Gui,Submit, Nohide
 thread, interrupt, 0
 thread, priority, 0
 gosub, EnableBitrate
 gosub, DisableGlitch
 gosub, DisableVideoCustomInput
-Gui,Submit, Nohide
 
 transform, BRvar, Deref, %BRvar%
 transform, VQvar, Deref, %VQvar%
@@ -193,20 +199,23 @@ transform, NoiseVar, Deref, %NoiseVar%
 transform, UserVideoInput, Deref, %UserVideoInput%
 ffmpegvar := "ffmpeg %UserVideoInput% -s %Resolution% -f nut -c:v %VCodec% %BRvar% %VQvar% %CodecSettings% -strict -2 %NoiseVar% -vf %VideoFilters% -  | ffmpeg -i - -f libndi_newtek -vf hflip -pix_fmt uyvy422 ShittyWebcam2.0"
 transform, ffmpegvar, Deref, %ffmpegvar%
- msgbox, %ffmpegvar%
+ ;msgbox, %ffmpegvar%
 Run, %ComSpec% /c %ffmpegvar%,,Min,pid2
 return
 
 UDPCurruption:
+Gui,Submit, Nohide
 thread, interrupt, 0
 thread, priority, 0
+gosub, DisableGlitch
 gosub, EnableBitrate
-Gui,Submit, Nohide
+gosub, DisableVideoCustomInput
 
 transform, BRvar, Deref, %BRvar%
 transform, VQvar, Deref, %VQvar%
 transform, NoiseVar, Deref, %NoiseVar%
-ffmpegvar := "ffmpeg -f dshow -framerate 15 -vcodec mjpeg -i video=""%WebCamName%"" -s %Resolution% -f nut -c:v %VCodec% %BRvar% %VQvar% %CodecSettings% -strict -2 %NoiseVar% -vf %VideoFilters% udp:127.0.0.1:1337"
+transform, UserVideoInput, Deref, %UserVideoInput%
+ffmpegvar := "ffmpeg %UserVideoInput% -s %Resolution% -f nut -c:v %VCodec% %BRvar% %VQvar% %CodecSettings% -strict -2 %NoiseVar% -vf %VideoFilters% udp:127.0.0.1:1337"
 transform, ffmpegvar, Deref, %ffmpegvar%
 
 Run, ffmpeg -f nut -i udp:127.0.0.1:1337 -f libndi_newtek -vf hflip -pix_fmt uyvy422 ShittyWebcam2.0,,Min
@@ -215,16 +224,18 @@ Run, %ComSpec% /c %ffmpegvar%,,Min,pid2
 return
 
 TESTIT:
+Gui,Submit, Nohide
 thread, interrupt, 0
 thread, priority, 0
 gosub, DisableGlitch
 gosub, EnableBitrate
-Gui,Submit, Nohide
+gosub, DisableVideoCustomInput
 
 transform, BRvar, Deref, %BRvar%
 transform, VQvar, Deref, %VQvar%
 transform, NoiseVar, Deref, %NoiseVar%
-ffmpegvar := "ffmpeg -f dshow -framerate 15 -vcodec mjpeg -i video=""%WebCamName%"" -s %Resolution% -f nut -c:v %VCodec% %BRvar% %VQvar% %CodecSettings% -strict -2 %NoiseVar% -vf %VideoFilters% -  | ffplay -i -"
+transform, UserVideoInput, Deref, %UserVideoInput%
+ffmpegvar := "ffmpeg %UserVideoInput% -s %Resolution% -f nut -c:v %VCodec% %BRvar% %VQvar% %CodecSettings% -strict -2 %NoiseVar% -vf %VideoFilters% -  | ffplay -i -"
 transform, ffmpegvar, Deref, %ffmpegvar%
  msgbox, %ffmpegvar%
 Runwait, %ComSpec% /k %ffmpegvar%,,,pid2
@@ -337,6 +348,12 @@ Return
 
 AudioInput:
 FileSelectFile, UserAudioInput
+ if ErrorLevel {
+msgbox,4096,Yo, Uh, You didn't select shit cap'n.
+GuiControl,3:, AudioInputVar, 0
+return
+}
+ else
 UserAudioInput := "-i " . chr(0x22) . UserAudioInput . chr(0x22) ; Encloses file location in quotes.
 GuiControl, 3:, AudioInputVar, 1
 return
@@ -508,7 +525,7 @@ transform, AudioNoiseVar, Deref, %AudioNoiseVar%
 transform, UserAudioInput, Deref, %UserAudioInput% 
 ffmpegAudiovar := "ffmpeg %UserAudioInput% %AudioContainerFormat% -c:a %ACodec% %AudioBRvar% %AQvar% %AudioCodecSettings% -strict -2 %AudioNoiseVar% -  | ffplay -i - %AudioFilters%"
 transform, ffmpegAudiovar, Deref, %ffmpegAudiovar%
- msgbox, %ffmpegAudiovar%
+ ;msgbox, %ffmpegAudiovar%
    Run, mmsys.cpl
     WinWait,Sound
     ControlSend,SysListView321,{Down 4} ;Select VAC Device
