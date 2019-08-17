@@ -74,45 +74,46 @@ GuiControl,1:, VideoInputVar, 1
 return
 
 
+
 EnableBitrate:
-GuiControlGet, Bitrate
-if (Bitrate = 0) {
-GuiControl, 1:Enable, VQuality
-GuiControl, 1:Disable, BitrateVal
-BRvar := " "
-VQvar := "-q:v %VQuality%"
+  GuiControlGet, Bitrate
+   if (Bitrate = 0) {
+    GuiControl, 1:Enable, VQuality
+    GuiControl, 1:Disable, BitrateVal
+ BRvar := " "
+ VQvar := "-q:v %VQuality%"
 }
 
-if (Bitrate = 1) {
-GuiControl, 1:Enable, BitrateVal
-GuiControl, 1:Disable, VQuality
-BRvar := "-b:v %BitrateVal% "
-VQvar := " "
+   if (Bitrate = 1) {
+    GuiControl, 1:Enable, BitrateVal
+    GuiControl, 1:Disable, VQuality
+ BRvar := "-b:v %BitrateVal% "
+ VQvar := " "
 }
 return
 
 DisableGlitch:
-GuiControlGet, GlitchVar
-if (GlitchVar = 1) {
-GuiControl, 1:Enable, GlitchAmount
-NoiseVar := "-bsf noise=%GlitchAmount%"
+   GuiControlGet, GlitchVar
+    if (GlitchVar = 1) {
+     GuiControl, 1:Enable, GlitchAmount
+ NoiseVar := "-bsf noise=%GlitchAmount%"
 }
 
-if (GlitchVar = 0) {
-GuiControl, 1:Disable, GlitchAmount
-NoiseVar := " "
+    if (GlitchVar = 0) {
+     GuiControl, 1:Disable, GlitchAmount
+ NoiseVar := " "
 }
 return
 
 DisableVideoCustomInput:
-GuiControlGet, VideoInputVar
-if (VideoInputVar = 0) {
-UserVideoInput := "-f dshow -framerate 15 -vcodec mjpeg -i video=""%WebCamName%"""
+    GuiControlGet, VideoInputVar
+     if (VideoInputVar = 0) {
+ UserVideoInput := "-f dshow -framerate 15 -vcodec mjpeg -i video=""%WebCamName%"""
 }
 
-if (VideoInputVar = 1) {
-UserVideo := UserVideoInput
-msgbox, Device Input Disabled.
+     if (VideoInputVar = 1) {
+ UserVideo := UserVideoInput
+ msgbox, Device Input Disabled.
 }
 return
 
@@ -169,11 +170,12 @@ Return
 
 
 SaveSettings:
-Gui, 2:Submit, NoHide
-sleep, 30
-Gui, 2:Show, Hide
+  Gui, 2:Submit, NoHide
+ sleep, 30
+  Gui, 2:Show, Hide
+
 if (VideoFilters = "") {
-global VideoFilters := "null"
+  global VideoFilters := "null"
 }
 return
 
@@ -224,7 +226,7 @@ transform, VQvar, Deref, %VQvar%
 transform, NoiseVar, Deref, %NoiseVar%
 ffmpegvar := "ffmpeg -f dshow -framerate 15 -vcodec mjpeg -i video=""%WebCamName%"" -s %Resolution% -f nut -c:v %VCodec% %BRvar% %VQvar% %CodecSettings% -strict -2 %NoiseVar% -vf %VideoFilters% -  | ffplay -i -"
 transform, ffmpegvar, Deref, %ffmpegvar%
- ;msgbox, %ffmpegvar%
+ msgbox, %ffmpegvar%
 Runwait, %ComSpec% /k %ffmpegvar%,,,pid2
 return
 
@@ -278,7 +280,7 @@ AudioNoiseVar := "-bsf noise=36000"
 AudioCustomUDPval := "0088"
 UserAudioInput := "-f lavfi -i sine=300"
 AudioFilters := "-af anull"
-global IsCustomGlitch := "0"
+IsCustomGlitch := "0"
 Return
 
 CustomAudioGlitchAmount:
@@ -298,9 +300,9 @@ if (A_Gui = 6 && wParam = 13) ;Close GUI after hitting ENTER Key
  Gui, 6:Submit, NoHide
   AudioGlitchAmount := CustomAudioGlitchAmountVar
  Gui, 6:Show, Hide
- return
+return
  }
- }
+}
 Gui 6:-Sysmenu
 Gui 6:Show, w185 h65, Because The Slider Can Be An Gay
 Gui,6:+AlwaysOnTop
@@ -324,9 +326,9 @@ if (A_Gui = 7 && wParam = 13) ;Close GUI after hitting ENTER Key
  Gui, 7:Submit, NoHide
   AudioBitrateVal := CustomAudioBitrateAmountVar
  Gui, 7:Show, Hide
- return
+return
  }
- }
+}
 Gui 7:-Sysmenu
 Gui 7:Show, w185 h65, Because The Slider Can Be An Gay
 Gui,7:+AlwaysOnTop
@@ -341,79 +343,82 @@ return
 
 
 EnableAudioBitrate:
-GuiControlGet, AudioBitrate
-if (AudioBitrate = 0) {
-GuiControl, 3:Enable, AQuality
-GuiControl, 3:Disable, AudioBitrateVal
-AudioBRvar := " "
-AQvar := "-q:a %AQuality%"
+  GuiControlGet, AudioBitrate
+ if (AudioBitrate = 0) {
+   GuiControl, 3:Enable, AQuality
+   GuiControl, 3:Disable, AudioBitrateVal
+ AudioBRvar := " "
+ AQvar := "-q:a %AQuality%"
 }
 
-if (AudioBitrate = 1) {
-GuiControl, 3:Enable, AudioBitrateVal
-GuiControl, 3:Disable, AQuality
-AudioBRvar := "-b:a %AudioBitrateVal% "
-AQvar := " "
+  if (AudioBitrate = 1) {
+   GuiControl, 3:Enable, AudioBitrateVal
+   GuiControl, 3:Disable, AQuality
+ AudioBRvar := "-b:a %AudioBitrateVal% "
+ AQvar := " "
 }
 return
 
 DisableAudioGlitch:
-GuiControlGet, AudioGlitchVar
-if (AudioGlitchVar = 1) {
-GuiControl, 3:Enable, AudioGlitchAmount
-AudioNoiseVar := "-bsf noise=%AudioGlitchAmount%"
+ GuiControlGet, AudioGlitchVar
+  if (AudioGlitchVar = 1) {
+  GuiControl, 3:Enable, AudioGlitchAmount
+ AudioNoiseVar := "-bsf noise=%AudioGlitchAmount%"
 }
 
-if (AudioGlitchVar = 0) {
-GuiControl, 3:Disable, AudioGlitchAmount
-AudioNoiseVar := " "
+  if (AudioGlitchVar = 0) {
+  GuiControl, 3:Disable, AudioGlitchAmount
+ AudioNoiseVar := " "
 }
 return
 
 DisableAudioCustomInput:
-GuiControlGet, AudioInputVar
-if (AudioInputVar = 0) {
-UserAudioInput := "-f dshow -i audio=""%MicrophoneName%"""
+  GuiControlGet, AudioInputVar
+ if (AudioInputVar = 0) {
+ UserAudioInput := "-f dshow -i audio=""%MicrophoneName%"""
 }
 
-if (AudioInputVar = 1) {
-UserAudioInput := UserAudioInput
-;msgbox, Device Input Disabled.
+ if (AudioInputVar = 1) {
+ UserAudioInput := UserAudioInput
+  ;msgbox, Device Input Disabled.
 }
 return
 
 EnableCustomGlitch:
-if (IsCustomGlitch = 0) {
-AudioNoiseVar := "-bsf noise=%AudioGlitchAmount%"
+  if (IsCustomGlitch = 0) {
+ AudioNoiseVar := "-bsf noise=%AudioGlitchAmount%"
    ;msgbox, %AudioNoiseVar%
 }
 
-if (IsCustomGlitch = 1) {
-AudioNoiseVar := "-bsf noise=%CustomAudioGlitchAmountVar%"
+  if (IsCustomGlitch = 1) {
+ AudioNoiseVar := "-bsf noise=%CustomAudioGlitchAmountVar%"
    ;msgbox, %AudioNoiseVar%
+}
+  if (AudioGlitchVar = 0 && IsCustomGlitch = 0) { ;bug fix to allow turning off audio glitches
+ AudioNoiseVar := " "
 }
 return
 
 EnableCustomAudioBitrate:
-if (IsCustomAudioBitrate = 0) {
-AudioBRvar := AudioBRvar
-   ;msgbox, %AudioNoiseVar%
+  if (IsCustomAudioBitrate = 0) {
+ AudioBRvar := AudioBRvar
+  ;msgbox, %AudioNoiseVar%
 }
 
-if (IsCustomAudioBitrate = 1) {
-AudioBRvar := "-b:a %CustomAudioBitrateAmountVar% "
-   ;msgbox, %AudioNoiseVar%
+  if (IsCustomAudioBitrate = 1) {
+ AudioBRvar := "-b:a %CustomAudioBitrateAmountVar% "
+  ;msgbox, %AudioNoiseVar%
 }
 return
 
 CheckAudioFormat:
-GuiControlGet, AudioContainerFormat
-if (AudioContainerFormat = "") {
+   GuiControlGet, AudioContainerFormat
+  if (AudioContainerFormat = "") {
  global AudioContainerFormat := ""
 }
 else
  AudioContainerFormat := "-f " . AudioContainerFormat
- return
+return
 
 AudioOptions:
 Gui 4:+LastFoundExist
@@ -467,11 +472,11 @@ SpeedUpAudio:
 Return
 
 SaveAudioSettings:
-Gui, 4:Submit, NoHide
+ Gui, 4:Submit, NoHide
 sleep, 30
-Gui, 4:Show, Hide
-if (AudioFilters = "") {
-global AudioFilters := "-af anull"
+ Gui, 4:Show, Hide
+  if (AudioFilters = "") {
+ global AudioFilters := "-af anull"
 }
 
 if (Timestamp = "") {
@@ -501,7 +506,7 @@ transform, AudioBRvar, Deref, %AudioBRvar%
 transform, AQvar, Deref, %AQvar%
 transform, AudioNoiseVar, Deref, %AudioNoiseVar%
 transform, UserAudioInput, Deref, %UserAudioInput% 
-ffmpegAudiovar := "ffmpeg %UserAudioInput% %AudioContainerFormat% -c:a %ACodec% %AudioBRvar% %AQvar% %AudioCodecSettings% -strict -2 %AudioNoiseVar% -  | ffplay %AudioContainerFormat% -i - %AudioFilters%"
+ffmpegAudiovar := "ffmpeg %UserAudioInput% %AudioContainerFormat% -c:a %ACodec% %AudioBRvar% %AQvar% %AudioCodecSettings% -strict -2 %AudioNoiseVar% -  | ffplay -i - %AudioFilters%"
 transform, ffmpegAudiovar, Deref, %ffmpegAudiovar%
  msgbox, %ffmpegAudiovar%
    Run, mmsys.cpl
@@ -536,7 +541,7 @@ transform, ffmpegAudiovar, Deref, %ffmpegAudiovar%
 	
 	sleep, 1000
 	WinShow, ahk_id %hwnd%
-   return
+  return
 
 
 AudioTESTIT:
@@ -544,18 +549,12 @@ Gui, 3:Submit, Nohide
 Gui, 6:Submit, Nohide
 SetTitleMatchMode, 2
 
+gosub, CheckAudioFormat
 gosub, EnableAudioBitrate
 gosub, DisableAudioGlitch
 gosub, DisableAudioCustomInput
 gosub, EnableCustomGlitch
 gosub, EnableCustomAudioBitrate
-
-GuiControlGet, AudioContainerFormat
-if (AudioContainerFormat = "") {
- global AudioContainerFormat := ""
-}
-else
- AudioContainerFormat := "-f " . AudioContainerFormat
 
 transform, AudioContainerFormat, Deref, %AudioContainerFormat%
 transform, AudioBRvar, Deref, %AudioBRvar%
@@ -565,7 +564,7 @@ transform, UserAudioInput, Deref, %UserAudioInput%
 ffmpegAudiovar := "ffmpeg %Timestamp% %UserAudioInput% %AudioContainerFormat% -c:a %ACodec% %AudioBRvar% %AQvar% %AudioCodecSettings% -strict -2 %AudioNoiseVar% -  | ffplay -i - %AudioFilters%"
 transform, ffmpegAudiovar, Deref, %ffmpegAudiovar%
 
-msgbox, %ffmpegAudiovar%
+ msgbox, %ffmpegAudiovar%
 run, %ComSpec% /k %ffmpegAudioVar%
 return
 
@@ -576,6 +575,7 @@ thread, interrupt, 0
 thread, priority, 0
 Gui, 3:Submit, Nohide
 Gui, 6:Submit, Nohide
+
 gosub, CheckAudioFormat
 gosub, EnableAudioBitrate
 gosub, DisableAudioGlitch
@@ -583,7 +583,7 @@ gosub, DisableAudioCustomInput
 gosub, EnableCustomGlitch
 gosub, EnableCustomAudioBitrate
 
-WinHide, ahk_id %hwnd%
+   WinHide, ahk_id %hwnd%
 
 transform, AudioContainerFormat, Deref, %AudioContainerFormat%
 transform, AudioBRvar, Deref, %AudioBRvar%
@@ -592,7 +592,7 @@ transform, AudioNoiseVar, Deref, %AudioNoiseVar%
 transform, UserAudioInput, Deref, %UserAudioInput% 
  
 ffmpegAudiovar := "ffmpeg %Timestamp% %UserAudioInput% %AudioContainerFormat% -c:a %ACodec% %AudioBRvar% %AQvar% %AudioCodecSettings% -strict -2 %AudioNoiseVar% udp:127.0.0.1:1337"
-ffplayAudiovar := "ffplay %AudioContainerFormat% -i udp:127.0.0.1:1337 %AudioFilters%"
+ffplayAudiovar := "ffplay -i udp:127.0.0.1:1337 %AudioFilters%"
 
 transform, ffmpegAudiovar, Deref, %ffmpegAudiovar%
 transform, ffplayAudiovar, Deref, %ffplayAudiovar%
@@ -620,7 +620,7 @@ transform, ffplayAudiovar, Deref, %ffplayAudiovar%
 	
 	sleep, 1000
 	WinShow, ahk_id %hwnd%
-   return
+  return
 
 GetDevices:
 MakeList := ""
