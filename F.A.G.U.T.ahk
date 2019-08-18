@@ -53,19 +53,25 @@ Gui Add, Checkbox, x32 y229 w120 h17 vBitrate gEnableBitrate, Force Bitrate?
 Gui Add, Checkbox, x32 y176 w12 h17 Checked vGlitchVar gDisableGlitch,
 Gui Add, Text, x47 y124 w72 h23 +0x200, Video Quality
 Gui Add, Text, x48 y176 w72 h15 +0x200, Glitch Amount
+
+;Video Device Options
+Gui Add, Button, x16 y45 w13 h13 gVideoDeviceOptions,
+
 Gui 1:-Sysmenu
 Gui 1:Show, w161 h351,F.A.G.U.T
 winget , hwnd,ID,F.A.G.U.T  ; this will set hwnd to the handle of the window 
 WinSet, alwaysontop ,on,ahk_id %hwnd%
 GuiControl, Choose, WebCamName, 1
 
-;Default settings
+ ;Default Video settings
 VideoFilters := "fps=60"
 Resolution := "640x360"
 CodecSettings := "-bf 0 -g 999999"
 NoiseVar := "-bsf noise=36000"
-CustomUDPval := "0088"	 
+CustomUDPval := "0088"
+VideoDeviceOptionVar := "-framerate 15 -vcodec mjpeg"
 Return
+
 
 VideoInput:
 FileSelectFile, UserVideoInput
@@ -80,6 +86,38 @@ GuiControl,1:, VideoInputVar, 1
 return
 
 
+VideoDeviceOptions:
+Gui, Submit, NoHide
+global newWebCamName := WebCamName
+
+Gui 8:+LastFoundExist
+if WinExist() {
+    Gui, 8:Show
+	return
+}
+Gui 8:Add, Text, x33 y5 w120 h23 +0x200, In Case FFmpeg Crashes
+Gui 8:Add, Edit, x32 y28 w120 h21 vVideoDeviceOptionVar,-framerate 15 -vcodec mjpeg
+   
+   global VideoDeviceOptionVar := VideoDeviceOptionVar
+   
+OnMessage(0x100, "OnKeyDown3")
+OnKeyDown3(wParam3)
+{
+if (A_Gui = 8 && wParam3 = 13) ;Close GUI after hitting ENTER Key 
+{
+ Gui, 8:Submit, NoHide
+
+  VideoDeviceOptionVar := "-f dshow " . VideoDeviceOptionVar
+  
+ Gui, 8:Show, Hide
+ ;msgbox, %VideoDeviceOptionVar%
+return
+ }
+}
+Gui 8:-Sysmenu
+Gui 8:Show, w185 h65, DirectShow Video Device Options
+Gui,8:+AlwaysOnTop
+Return
 
 EnableBitrate:
   GuiControlGet, Bitrate
@@ -114,7 +152,7 @@ return
 DisableVideoCustomInput:
     GuiControlGet, VideoInputVar
      if (VideoInputVar = 0) {
- UserVideoInput := "-f dshow -framerate 15 -vcodec mjpeg -i video=""%WebCamName%"""
+ UserVideoInput := "%VideoDeviceOptionVar% -i video=""%WebCamName%"""
 }
 
      if (VideoInputVar = 1) {
@@ -284,7 +322,7 @@ winget , hwnd,ID,F.A.G.U.T-AUDIO  ; this will set hwnd to the handle of the wind
 WinSet, alwaysontop ,on,ahk_id %hwnd%
 GuiControl, 3:Choose, WebCamName, 7
 
-;Default Audio settings
+ ;Default Audio settings
 Resolution := "640x360"
 AudioCodecSettings := "-ar 8000 -ac 2"
 AudioNoiseVar := "-bsf noise=36000"
@@ -638,6 +676,9 @@ transform, ffplayAudiovar, Deref, %ffplayAudiovar%
 	sleep, 1000
 	WinShow, ahk_id %hwnd%
   return
+
+
+
 
 GetDevices:
 MakeList := ""
