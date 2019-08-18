@@ -10,7 +10,7 @@ https://drive.google.com/file/d/1MhtCV9VmVXMziulUwm3yQ2Q1EkwB7jOo/view
 
 And this. Install NDI Virtual Input: https://www.newtek.com/ndi/tools/
 
-![Image 1](https://i.imgur.com/l2nVu8M.png)![Image 2](https://i.imgur.com/paX6BTF.png)
+![Image 1](https://i.imgur.com/mo5BtTv.png)![Image 2](https://i.imgur.com/paX6BTF.png)
 
 This particular setting in the gif is the wmv2 codec set at lossless quality (-q:v 0) with corruption set to 36000
 ![wao](https://media.giphy.com/media/Jn4tXKUWUejJIJAALV/giphy.gif)
