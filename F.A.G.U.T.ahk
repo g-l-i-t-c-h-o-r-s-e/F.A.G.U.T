@@ -333,13 +333,11 @@ IsCustomGlitch := "0"
 Return
 
 CustomAudioGlitchAmount:
-Gui 6:+LastFoundExist
-if WinExist() {
-    Gui, 6:Show
-	return
-}
+Gui, 6:Submit, NoHide
+global DefGlVar := CustomAudioGlitchAmountVar
+
 Gui 6:Add, Text, x33 y5 w120 h23 +0x200, Custom Glitch Amount
-Gui 6:Add, Edit, x32 y28 w120 h21 vCustomAudioGlitchAmountVar,
+Gui 6:Add, Edit, x32 y28 w120 h21 vCustomAudioGlitchAmountVar, %DefGlVar%
 Gui 6:Add, CheckBox, x139 y10 w14 h14 +Checked vIsCustomGlitch gEnableCustomGlitch
 OnMessage(0x100, "OnKeyDown")
 OnKeyDown(wParam)
@@ -347,25 +345,26 @@ OnKeyDown(wParam)
 if (A_Gui = 6 && wParam = 13) ;Close GUI after hitting ENTER Key 
 {
  Gui, 6:Submit, NoHide
+ 
   AudioGlitchAmount := CustomAudioGlitchAmountVar
- Gui, 6:Show, Hide
+  
+ Gui, 6:Destroy
 return
  }
 }
 Gui 6:-Sysmenu
 Gui 6:Show, w185 h65, Because The Slider Can Be An Gay
 Gui,6:+AlwaysOnTop
+  ;msgbox, %DefGlVar%
 Return
 
 
 CustomAudioBitrateAmount:
-Gui 7:+LastFoundExist
-if WinExist() {
-    Gui, 7:Show
-	return
-}
+Gui, 7:Submit, NoHide
+global DefBrVar := CustomAudioBitrateAmountVar
+
 Gui 7:Add, Text, x33 y5 w120 h23 +0x200, Custom Bitrate Amount
-Gui 7:Add, Edit, x32 y28 w120 h21 vCustomAudioBitrateAmountVar,
+Gui 7:Add, Edit, x32 y28 w120 h21 vCustomAudioBitrateAmountVar, %DefBrVar%
 Gui 7:Add, CheckBox, x139 y10 w14 h14 +Checked vIsCustomAudioBitrate gEnableCustomAudioBitrate
 OnMessage(0x100, "OnKeyDown2")
 OnKeyDown2(wParam)
@@ -373,8 +372,10 @@ OnKeyDown2(wParam)
 if (A_Gui = 7 && wParam = 13) ;Close GUI after hitting ENTER Key 
 {
  Gui, 7:Submit, NoHide
+ 
   AudioBitrateVal := CustomAudioBitrateAmountVar
- Gui, 7:Show, Hide
+  
+ Gui, 7:Destroy
 return
  }
 }
@@ -846,3 +847,4 @@ If errorlevel {
 	Sleep, 10
 	}
    ExitApp
+   
