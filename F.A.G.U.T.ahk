@@ -69,12 +69,12 @@ Resolution := "640x360"
 CodecSettings := "-bf 0 -g 999999"
 NoiseVar := "-bsf noise=36000"
 CustomUDPval := "0088"
-VideoDeviceOptionVar := "-framerate 15 -vcodec mjpeg"
+VideoDeviceOptionVar := "-f dshow -framerate 15 -vcodec mjpeg"
 Return
 
 
 VideoInput:
-FileSelectFile, UserVideoInput
+FileSelectFile, UserVideoInput,,,Select An Input Video File for Playback...
  if ErrorLevel {
 msgbox,4096,Yo, Uh, You didn't select shit cap'n.
 GuiControl,1:, VideoInputVar, 0
@@ -386,7 +386,7 @@ Return
 
 
 AudioInput:
-FileSelectFile, UserAudioInput
+FileSelectFile, UserAudioInput,,,Select An Input Audio File for Playback...
  if ErrorLevel {
 msgbox,4096,Yo, Uh, You didn't select shit cap'n.
 GuiControl,3:, AudioInputVar, 0
@@ -847,4 +847,3 @@ If errorlevel {
 	Sleep, 10
 	}
    ExitApp
-   
